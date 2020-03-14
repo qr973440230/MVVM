@@ -9,7 +9,8 @@ data class NetworkStatus(val status: Status, val msg: String? = null) {
             NetworkStatus(Status.LOADING)
         val SUCCESS =
             NetworkStatus(Status.SUCCESS)
-        fun error(msg: String?) =
-            NetworkStatus(Status.ERROR, msg)
+
+        @JvmOverloads
+        fun error(msg: String? = null) = NetworkStatus(Status.ERROR, msg)
     }
 }

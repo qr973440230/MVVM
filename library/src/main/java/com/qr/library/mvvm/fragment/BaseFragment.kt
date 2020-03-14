@@ -8,6 +8,7 @@ import androidx.annotation.LayoutRes
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
+import com.qr.library.mvvm.di.injector.InjectorUtils
 
 abstract class BaseFragment<DB : ViewDataBinding> : Fragment() {
     override fun onCreateView(

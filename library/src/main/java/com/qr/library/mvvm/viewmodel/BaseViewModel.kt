@@ -2,6 +2,7 @@ package com.qr.library.mvvm.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import com.qr.library.mvvm.di.injector.InjectorUtils
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasAndroidInjector
@@ -11,21 +12,9 @@ abstract class BaseViewModel(application: Application) : AndroidViewModel(applic
     HasAndroidInjector {
 
     init {
-        inject(application)
-    }
-
-    private fun inject(application: Application) {
-        if (application !is HasAndroidInjector) {
-            throw RuntimeException(
-                String.format(
-                    "%s does not implement %s",
-                    application::class.java.canonicalName,
-                    HasAndroidInjector::class.java.canonicalName
-                )
-            );
+        application.let {
+            InjectorUtils.inject(it, this)
         }
-        val androidInjector = application.androidInjector()
-        androidInjector.inject(this)
     }
 
     @Inject
