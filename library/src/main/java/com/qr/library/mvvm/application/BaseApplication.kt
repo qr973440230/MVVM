@@ -12,6 +12,7 @@ import timber.log.Timber
 
 
 abstract class BaseApplication : DaggerApplication() {
+
     override fun onCreate() {
         super.onCreate()
 

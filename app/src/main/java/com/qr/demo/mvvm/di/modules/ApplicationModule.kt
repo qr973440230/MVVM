@@ -1,10 +1,12 @@
 package com.qr.demo.mvvm.di.modules
 
+import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.qr.demo.mvvm.APP
+import com.qr.library.mvvm.cache.CacheManager
 import dagger.Module
 import dagger.Provides
 import okhttp3.OkHttpClient
@@ -21,8 +23,20 @@ object ApplicationModule {
 
     @Singleton
     @Provides
-    fun provideSharedPreferences(app: APP): SharedPreferences {
-        return app.getSharedPreferences("app_sp", Context.MODE_PRIVATE)
+    fun bindApplication(app: APP): Application {
+        return app;
+    }
+
+    @Singleton
+    @Provides
+    fun cacheManager(application: Application, gson: Gson): CacheManager {
+        return CacheManager(application, gson)
+    }
+
+    @Singleton
+    @Provides
+    fun provideSharedPreferences(application: Application): SharedPreferences {
+        return application.getSharedPreferences("app_sp", Context.MODE_PRIVATE)
     }
 
     @Singleton
