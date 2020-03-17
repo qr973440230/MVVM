@@ -6,6 +6,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import com.qr.demo.mvvm.R
 import com.qr.demo.mvvm.model.api.response.ApiResponse
+import com.qr.library.mvvm.activity.shortSnackBar
 import dagger.android.support.DaggerAppCompatActivity
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
