@@ -2,16 +2,15 @@ package com.qr.demo.mvvm.ui
 
 import android.os.Bundle
 import androidx.activity.viewModels
-import androidx.lifecycle.Observer
-import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.distinctUntilChanged
+import androidx.lifecycle.liveData
+import androidx.lifecycle.observe
+import androidx.lifecycle.toPublisher
 import com.qr.demo.mvvm.R
-import com.qr.demo.mvvm.model.api.response.ApiResponse
-import com.qr.library.mvvm.activity.shortSnackBar
+import com.qr.library.mvvm.livedata.throttleFirst
+import com.qr.library.mvvm.livedata.toObservable
 import dagger.android.support.DaggerAppCompatActivity
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import timber.log.Timber
-import javax.inject.Inject
+import java.util.concurrent.TimeUnit
 
 class MainActivity : DaggerAppCompatActivity() {
     private val mainViewModel by viewModels<MainViewModel>()
@@ -19,5 +18,11 @@ class MainActivity : DaggerAppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        liveData {
+            emit(1)
+        }.throttleFirst(1, TimeUnit.SECONDS)
+            .observe(this) {
+
+            }
     }
 }
