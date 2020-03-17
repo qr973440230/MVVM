@@ -120,10 +120,6 @@ dependencies {
     // Picasso
     api 'com.squareup.picasso:picasso:2.71828'
 
-    // rxJava3
-    api "io.reactivex.rxjava3:rxjava:3.0.0"
-    api 'io.reactivex.rxjava3:rxandroid:3.0.0'
-
     // 自定义库
     api 'com.github.qr973440230:Views:1.0.0'
     api 'com.github.qr973440230:Utils:1.0.0'

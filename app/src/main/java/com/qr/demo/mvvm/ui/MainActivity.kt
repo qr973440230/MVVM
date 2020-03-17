@@ -2,14 +2,13 @@ package com.qr.demo.mvvm.ui
 
 import android.os.Bundle
 import androidx.activity.viewModels
-import androidx.lifecycle.distinctUntilChanged
+import androidx.lifecycle.Observer
 import androidx.lifecycle.liveData
-import androidx.lifecycle.observe
-import androidx.lifecycle.toPublisher
 import com.qr.demo.mvvm.R
 import com.qr.library.mvvm.livedata.throttleFirst
-import com.qr.library.mvvm.livedata.toObservable
 import dagger.android.support.DaggerAppCompatActivity
+import kotlinx.coroutines.delay
+import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 class MainActivity : DaggerAppCompatActivity() {
@@ -18,11 +17,14 @@ class MainActivity : DaggerAppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        liveData {
-            emit(1)
-        }.throttleFirst(1, TimeUnit.SECONDS)
-            .observe(this) {
 
+        liveData {
+            for (i in 1..3) {
+                emit(i)
+                delay(10)
             }
+        }.throttleFirst(1000,TimeUnit.MILLISECONDS).observe(this,Observer{
+            Timber.d("$it")
+        })
     }
 }
