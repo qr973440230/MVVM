@@ -21,6 +21,4 @@ object TabLayoutAdapter {
     ) {
         tabLayout.addOnTabSelectedListener(listener)
     }
-
-
 }
