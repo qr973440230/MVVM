@@ -1,10 +1,8 @@
 package com.qr.library.mvvm.livedata
 
 import androidx.lifecycle.*
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.delayFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.sample
 import java.util.concurrent.TimeUnit
 
 fun <T> LiveData<T>.throttleFirst(duration: Long, unit: TimeUnit): LiveData<T> {
@@ -25,6 +23,7 @@ fun <T> LiveData<T>.throttleFirst(duration: Long, unit: TimeUnit): LiveData<T> {
 }
 
 
+@FlowPreview
 fun <T> LiveData<T>.throttleLast(duration: Long, unit: TimeUnit): LiveData<T> {
     val durationMills = unit.toMillis(duration)
     return asFlow().debounce(durationMills).asLiveData()

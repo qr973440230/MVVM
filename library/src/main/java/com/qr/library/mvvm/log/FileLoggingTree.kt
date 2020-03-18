@@ -1,4 +1,4 @@
-package com.crsc.app.tram_app.config.log
+package com.qr.library.mvvm.log
 
 import android.util.Log
 import com.orhanobut.logger.Logger

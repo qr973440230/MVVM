@@ -2,7 +2,7 @@ package com.qr.library.mvvm.application
 
 import android.app.Activity
 import android.os.Bundle
-import com.crsc.app.tram_app.config.log.FileLoggingTree
+import com.qr.library.mvvm.log.FileLoggingTree
 import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.DiskLogAdapter
 import com.orhanobut.logger.Logger

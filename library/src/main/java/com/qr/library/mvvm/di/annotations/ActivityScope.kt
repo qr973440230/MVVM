@@ -1,4 +1,4 @@
-package com.crsc.app.tram_app.di.annotations
+package com.qr.library.mvvm.di.annotations
 
 import javax.inject.Scope
 

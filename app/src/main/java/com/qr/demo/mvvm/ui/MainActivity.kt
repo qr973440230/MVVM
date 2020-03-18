@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.liveData
+import com.alibaba.android.arouter.facade.annotation.Route
 import com.qr.demo.mvvm.R
 import com.qr.library.mvvm.livedata.throttleFirst
 import dagger.android.support.DaggerAppCompatActivity
