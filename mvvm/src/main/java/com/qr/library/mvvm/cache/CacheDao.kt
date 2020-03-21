@@ -15,4 +15,16 @@ interface CacheDao : BaseDao<Cache> {
 
     @Query("select data from Cache where `key` =:key")
     suspend fun getCacheAsync(key: String): String?
+
+    @Query("delete from Cache where `key` =:key")
+    fun deleteByKey(key: String)
+
+    @Query("delete from Cache where `key` =:key")
+    suspend fun deleteByKeyAsync(key: String)
+
+    @Query("delete from Cache")
+    fun clear()
+
+    @Query("delete from Cache")
+    suspend fun clearAsync()
 }

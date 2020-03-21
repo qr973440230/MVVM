@@ -44,5 +44,20 @@ class CacheManager(
         return cache?.let { gson.fromJson(it, T::class.java) }
     }
 
+    fun deleteByKey(key: String) {
+        cacheDao.deleteByKey(key)
+    }
+
+    suspend fun deleteByKeyAsync(key: String) {
+        cacheDao.deleteByKeyAsync(key)
+    }
+
+    fun clear() {
+        cacheDao.clear()
+    }
+
+    suspend fun clearAsync() {
+        cacheDao.clearAsync()
+    }
 }
 
