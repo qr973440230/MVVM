@@ -1,12 +1,12 @@
 package com.qr.library.mvvm.application
 
 import android.app.Activity
+import android.content.pm.ApplicationInfo
 import android.os.Bundle
 import com.qr.library.mvvm.log.FileLoggingTree
 import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.DiskLogAdapter
 import com.orhanobut.logger.Logger
-import com.qr.library.mvvm.BuildConfig
 import dagger.android.support.DaggerApplication
 import timber.log.Timber
 
@@ -17,7 +17,7 @@ abstract class BaseApplication : DaggerApplication() {
         super.onCreate()
 
         // Log Init
-        if (BuildConfig.DEBUG) {
+        if (isDebug()) {
             Logger.addLogAdapter(AndroidLogAdapter())
         } else {
             Logger.addLogAdapter(DiskLogAdapter())
@@ -57,5 +57,9 @@ abstract class BaseApplication : DaggerApplication() {
 
             }
         })
+    }
+
+    private fun isDebug(): Boolean {
+        return applicationInfo.flags.and(ApplicationInfo.FLAG_DEBUGGABLE) != 0
     }
 }
