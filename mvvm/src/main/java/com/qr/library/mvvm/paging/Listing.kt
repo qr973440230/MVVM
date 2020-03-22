@@ -1,4 +1,4 @@
-package com.qr.library.mvvm.repository.paging
+package com.qr.library.mvvm.paging
 
 import androidx.lifecycle.LiveData
 import androidx.paging.PagedList

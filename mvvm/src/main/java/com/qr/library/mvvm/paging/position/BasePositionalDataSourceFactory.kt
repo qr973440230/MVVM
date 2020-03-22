@@ -1,4 +1,4 @@
-package com.qr.library.mvvm.repository.paging.position
+package com.qr.library.mvvm.paging.position
 
 import androidx.lifecycle.MutableLiveData
 import androidx.paging.DataSource
