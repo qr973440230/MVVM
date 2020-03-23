@@ -113,8 +113,4 @@ dependencies {
     // Log
     api 'com.orhanobut:logger:2.2.0'
     api 'com.jakewharton.timber:timber:4.7.1'
-
-    // 自定义库
-    api 'com.github.qr973440230:Views:1.0.4'
-    api 'com.github.qr973440230:Utils:1.0.2'
 }
