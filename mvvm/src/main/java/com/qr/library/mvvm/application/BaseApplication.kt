@@ -7,6 +7,7 @@ import com.qr.library.mvvm.log.FileLoggingTree
 import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.DiskLogAdapter
 import com.orhanobut.logger.Logger
+import com.tencent.mmkv.MMKV
 import dagger.android.support.DaggerApplication
 import timber.log.Timber
 
@@ -23,6 +24,9 @@ abstract class BaseApplication : DaggerApplication() {
             Logger.addLogAdapter(DiskLogAdapter())
         }
         Timber.plant(FileLoggingTree())
+
+        // MMKV init
+        MMKV.initialize(this)
 
         // APPManager Init
         registerActivityLifecycleCallbacks(object : ActivityLifecycleCallbacks {
