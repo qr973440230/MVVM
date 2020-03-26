@@ -6,7 +6,6 @@ import android.content.SharedPreferences
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.qr.demo.mvvm.APP
-import com.qr.library.mvvm.cache.CacheManager
 import dagger.Module
 import dagger.Provides
 import okhttp3.OkHttpClient
@@ -25,12 +24,6 @@ object ApplicationModule {
     @Provides
     fun bindApplication(app: APP): Application {
         return app;
-    }
-
-    @Singleton
-    @Provides
-    fun cacheManager(application: Application, gson: Gson): CacheManager {
-        return CacheManager(application, gson)
     }
 
     @Singleton

@@ -5,5 +5,5 @@ import androidx.lifecycle.LiveData
 data class Resource<T>(
     val data: LiveData<T>,
     val status: LiveData<NetworkStatus>,
-    val retry: (() -> Unit)
+    val retry: (suspend () -> Unit)
 )
