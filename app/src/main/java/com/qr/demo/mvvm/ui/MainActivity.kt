@@ -33,8 +33,8 @@ class MainActivity : DaggerAppCompatActivity() {
                 delay(10)
             }
         }.throttleFirst(1000, TimeUnit.MILLISECONDS).observe(this, Observer {
-            val str = sharedPreferences().getString("1", null)
             sharedPreferences().edit().remove("1").apply()
+            val str = sharedPreferences().getString("1", null)
             if (str != null) {
                 logD(str)
             }
