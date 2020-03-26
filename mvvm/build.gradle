@@ -19,9 +19,9 @@ android {
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments = [
-                        "room.schemaLocation":"$projectDir/schemas".toString(),
-                        "room.incremental":"true",
-                        "room.expandProjection":"true"]
+                        "room.schemaLocation"  : "$projectDir/schemas".toString(),
+                        "room.incremental"     : "true",
+                        "room.expandProjection": "true"]
             }
         }
     }
@@ -113,4 +113,7 @@ dependencies {
     // Log
     api 'com.orhanobut:logger:2.2.0'
     api 'com.jakewharton.timber:timber:4.7.1'
+
+    // keyValue 缓存
+    implementation 'com.tencent:mmkv-static:1.0.24'
 }
