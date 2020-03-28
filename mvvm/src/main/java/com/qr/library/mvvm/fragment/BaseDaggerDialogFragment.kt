@@ -7,9 +7,9 @@ import android.view.ViewGroup
 import androidx.annotation.LayoutRes
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
-import androidx.fragment.app.Fragment
+import dagger.android.support.DaggerDialogFragment
 
-abstract class BaseFragment<DB : ViewDataBinding> : Fragment() {
+abstract class BaseDaggerDialogFragment<DB : ViewDataBinding> : DaggerDialogFragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

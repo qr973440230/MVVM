@@ -4,7 +4,6 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.google.android.material.snackbar.Snackbar
 
-
 // Toast
 fun Fragment.showShortToast(msg: String) =
     Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
