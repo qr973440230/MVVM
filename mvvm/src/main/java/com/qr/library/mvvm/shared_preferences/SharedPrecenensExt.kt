@@ -3,7 +3,10 @@ package com.qr.library.mvvm.shared_preferences
 import android.content.SharedPreferences
 import com.tencent.mmkv.MMKV
 
-fun sharedPreferences(): SharedPreferences = MMKV.defaultMMKV()
+val sharedPreferences: SharedPreferences by lazy {
+    MMKV.defaultMMKV()
+}
 
-fun multiThreadSharedPreferences(): SharedPreferences =
-    MMKV.mmkvWithID("MultiThreadSharedPreferences", MMKV.MULTI_PROCESS_MODE)
+val multiProcessSharedPreferences: SharedPreferences by lazy {
+    MMKV.mmkvWithID("MultiProcessSharedPreferences", MMKV.MULTI_PROCESS_MODE)
+}

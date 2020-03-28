@@ -5,15 +5,13 @@ import androidx.activity.viewModels
 import androidx.core.content.edit
 import androidx.lifecycle.Observer
 import androidx.lifecycle.liveData
-import com.alibaba.android.arouter.facade.annotation.Route
 import com.qr.demo.mvvm.R
-import com.qr.library.mvvm.context.showLongToast
 import com.qr.library.mvvm.livedata.throttleFirst
 import com.qr.library.mvvm.log.logD
+import com.qr.library.mvvm.log.logV
 import com.qr.library.mvvm.shared_preferences.sharedPreferences
 import dagger.android.support.DaggerAppCompatActivity
 import kotlinx.coroutines.delay
-import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 class MainActivity : DaggerAppCompatActivity() {
@@ -23,7 +21,7 @@ class MainActivity : DaggerAppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        sharedPreferences().edit(commit = true) {
+        sharedPreferences.edit(commit = true) {
             putString("1", "3")
         }
 
@@ -33,11 +31,12 @@ class MainActivity : DaggerAppCompatActivity() {
                 delay(10)
             }
         }.throttleFirst(1000, TimeUnit.MILLISECONDS).observe(this, Observer {
-            sharedPreferences().edit().remove("1").apply()
-            val str = sharedPreferences().getString("1", null)
+            val str = sharedPreferences.getString("1", null)
             if (str != null) {
                 logD(str)
+                logV(str)
             }
+            sharedPreferences.edit().remove("1").apply()
         })
     }
 }

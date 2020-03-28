@@ -92,7 +92,7 @@ dependencies {
     api "androidx.room:room-ktx:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
 
-    def work_version = "2.3.2"
+    def work_version = "2.3.4"
     api "androidx.work:work-runtime-ktx:$work_version"
 
     // dagger
@@ -112,7 +112,6 @@ dependencies {
 
     // Log
     api 'com.orhanobut:logger:2.2.0'
-    api 'com.jakewharton.timber:timber:4.7.1'
 
     // mmkv key-value 存储器 性能比SharedPreferences好
     api 'com.tencent:mmkv-static:1.1.0'

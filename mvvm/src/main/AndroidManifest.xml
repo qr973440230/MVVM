@@ -1,2 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.qr.library.mvvm" />
+    package="com.qr.library.mvvm">
+
+    <application>
+        <provider
+            android:name=".provider.MVVMInitProvider"
+            android:authorities="${applicationId}.mvvm.init.provider"
+            android:exported="false" />
+    </application>
+</manifest>
