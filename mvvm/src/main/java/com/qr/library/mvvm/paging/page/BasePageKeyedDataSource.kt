@@ -1,75 +1,87 @@
 package com.qr.library.mvvm.paging.page
 
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.liveData
+import androidx.lifecycle.switchMap
 import androidx.paging.PageKeyedDataSource
 import com.qr.library.mvvm.repository.NetworkStatus
 
 abstract class BasePageKeyedDataSource<Key, Value> : PageKeyedDataSource<Key, Value>() {
-    private var retry: (() -> Any)? = null
-
-    val refreshStatus by lazy {
-        MutableLiveData<NetworkStatus>()
-    }
-
+    private var _retry: (() -> Unit)? = null
     val networkStatus by lazy {
-        MutableLiveData<NetworkStatus>()
+        MediatorLiveData<NetworkStatus>().apply {
+            addSource(loadInitStatus) {
+                if (value != it) {
+                    value = it
+                }
+            }
+
+            addSource(loadAfterStatus) {
+                if (value != it) {
+                    value = it
+                }
+            }
+        }
     }
 
-    fun retryFailed() {
-        val preRetry = retry
-        retry = null
+    fun retry() {
+        val preRetry = _retry
+        _retry = null
         preRetry?.invoke()
     }
+
+
+    private val loadInitParams = MutableLiveData<LoadInitParams<Key, Value>>()
+    private val loadInitStatus = loadInitParams.switchMap {
+        liveData {
+            emit(NetworkStatus.LOADING)
+            try {
+                loadInitImpl(it.params, it.callback)
+                emit(NetworkStatus.SUCCESS)
+                _retry = null
+            } catch (e: Exception) {
+                emit(NetworkStatus.error(e.message))
+                _retry = ({ loadInitParams.postValue(it) })
+            }
+        }
+    }
+
+    @Throws(exceptionClasses = [Exception::class])
+    abstract suspend fun loadInitImpl(
+        params: LoadInitialParams<Key>,
+        callback: LoadInitialCallback<Key, Value>
+    )
 
     override fun loadInitial(
         params: LoadInitialParams<Key>,
         callback: LoadInitialCallback<Key, Value>
     ) {
-        refreshStatus.postValue(NetworkStatus.LOADING)
-        networkStatus.postValue(NetworkStatus.LOADING)
-        setLoadInitial(params, callback)
+        loadInitParams.postValue(LoadInitParams(params, callback))
     }
 
-    fun loadInitialSuccess() {
-        refreshStatus.postValue(NetworkStatus.SUCCESS)
-        networkStatus.postValue(NetworkStatus.SUCCESS)
-        retry = null
+    private val loadAfterParams = MutableLiveData<LoadAfterParams<Key, Value>>()
+    private val loadAfterStatus = loadAfterParams.switchMap {
+        liveData {
+            emit(NetworkStatus.LOADING)
+            try {
+                loadAfterImpl(it.params, it.callback)
+                emit(NetworkStatus.SUCCESS)
+                _retry = null
+            } catch (e: Exception) {
+                emit(NetworkStatus.error(e.message))
+                _retry = ({ loadAfterParams.postValue(it) })
+            }
+        }
     }
 
-    fun loadInitialFailed(
-        msg: String?,
-        params: LoadInitialParams<Key>,
-        callback: LoadInitialCallback<Key, Value>
-    ) {
-        val error = NetworkStatus.error(msg)
-        refreshStatus.postValue(error)
-        networkStatus.postValue(error)
-        retry = { loadInitial(params, callback) }
-    }
-
-    abstract fun setLoadInitial(
-        params: LoadInitialParams<Key>,
-        callback: LoadInitialCallback<Key, Value>
-    )
+    @Throws(exceptionClasses = [Exception::class])
+    abstract suspend fun loadAfterImpl(params: LoadParams<Key>, callback: LoadCallback<Key, Value>)
 
     override fun loadAfter(params: LoadParams<Key>, callback: LoadCallback<Key, Value>) {
-        networkStatus.postValue(NetworkStatus.LOADING)
-        setLoadAfter(params, callback)
+        loadAfterParams.postValue(LoadAfterParams(params, callback))
     }
-
-    fun loadAfterSuccess() {
-        networkStatus.postValue(NetworkStatus.SUCCESS)
-        retry = null
-    }
-
-    fun loadAfterFailed(msg: String?, params: LoadParams<Key>, callback: LoadCallback<Key, Value>) {
-        networkStatus.postValue(NetworkStatus.error(msg))
-        retry = { loadAfter(params, callback) }
-    }
-
-    abstract fun setLoadAfter(params: LoadParams<Key>, callback: LoadCallback<Key, Value>)
 
     override fun loadBefore(params: LoadParams<Key>, callback: LoadCallback<Key, Value>) {
     }
-
 }
