@@ -9,18 +9,16 @@ import com.qr.library.mvvm.repository.NetworkStatus
 
 abstract class BasePageKeyedDataSource<Key, Value> : PageKeyedDataSource<Key, Value>() {
     private var _retry: (() -> Unit)? = null
-    val networkStatus by lazy {
-        MediatorLiveData<NetworkStatus>().apply {
-            addSource(loadInitStatus) {
-                if (value != it) {
-                    value = it
-                }
+    val networkStatus = MediatorLiveData<NetworkStatus>().apply {
+        addSource(initStatus) {
+            if (value != it) {
+                value = it
             }
+        }
 
-            addSource(loadAfterStatus) {
-                if (value != it) {
-                    value = it
-                }
+        addSource(afterStatus) {
+            if (value != it) {
+                value = it
             }
         }
     }
@@ -32,8 +30,8 @@ abstract class BasePageKeyedDataSource<Key, Value> : PageKeyedDataSource<Key, Va
     }
 
 
-    private val loadInitParams = MutableLiveData<LoadInitParams<Key, Value>>()
-    private val loadInitStatus = loadInitParams.switchMap {
+    private val initParams = MutableLiveData<InitParams<Key, Value>>()
+    private val initStatus = initParams.switchMap {
         liveData {
             emit(NetworkStatus.LOADING)
             try {
@@ -41,14 +39,15 @@ abstract class BasePageKeyedDataSource<Key, Value> : PageKeyedDataSource<Key, Va
                 emit(NetworkStatus.SUCCESS)
                 _retry = null
             } catch (e: Exception) {
+                it.callback.onError(e)
                 emit(NetworkStatus.error(e.message))
-                _retry = ({ loadInitParams.postValue(it) })
+                _retry = ({ initParams.postValue(it) })
             }
         }
     }
 
     @Throws(exceptionClasses = [Exception::class])
-    abstract suspend fun loadInitImpl(
+    protected abstract suspend fun loadInitImpl(
         params: LoadInitialParams<Key>,
         callback: LoadInitialCallback<Key, Value>
     )
@@ -57,11 +56,11 @@ abstract class BasePageKeyedDataSource<Key, Value> : PageKeyedDataSource<Key, Va
         params: LoadInitialParams<Key>,
         callback: LoadInitialCallback<Key, Value>
     ) {
-        loadInitParams.postValue(LoadInitParams(params, callback))
+        initParams.postValue(InitParams(params, callback))
     }
 
-    private val loadAfterParams = MutableLiveData<LoadAfterParams<Key, Value>>()
-    private val loadAfterStatus = loadAfterParams.switchMap {
+    private val afterParams = MutableLiveData<AfterParams<Key, Value>>()
+    private val afterStatus = afterParams.switchMap {
         liveData {
             emit(NetworkStatus.LOADING)
             try {
@@ -69,17 +68,18 @@ abstract class BasePageKeyedDataSource<Key, Value> : PageKeyedDataSource<Key, Va
                 emit(NetworkStatus.SUCCESS)
                 _retry = null
             } catch (e: Exception) {
+                it.callback.onError(e)
                 emit(NetworkStatus.error(e.message))
-                _retry = ({ loadAfterParams.postValue(it) })
+                _retry = ({ afterParams.postValue(it) })
             }
         }
     }
 
     @Throws(exceptionClasses = [Exception::class])
-    abstract suspend fun loadAfterImpl(params: LoadParams<Key>, callback: LoadCallback<Key, Value>)
+    protected abstract suspend fun loadAfterImpl(params: LoadParams<Key>, callback: LoadCallback<Key, Value>)
 
     override fun loadAfter(params: LoadParams<Key>, callback: LoadCallback<Key, Value>) {
-        loadAfterParams.postValue(LoadAfterParams(params, callback))
+        afterParams.postValue(AfterParams(params, callback))
     }
 
     override fun loadBefore(params: LoadParams<Key>, callback: LoadCallback<Key, Value>) {
