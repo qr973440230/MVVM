@@ -10,25 +10,6 @@ import com.qr.library.mvvm.repository.NetworkStatus
 abstract class BasePositionalDataSource<Value> : PositionalDataSource<Value>() {
     private var _retry: (() -> Unit)? = null
 
-    val networkStatus = MediatorLiveData<NetworkStatus>().apply {
-        addSource(initStatus) {
-            if (value != it) {
-                value = it
-            }
-        }
-        addSource(rangeStatus) {
-            if (value != it) {
-                value = it
-            }
-        }
-    }
-
-    fun retry() {
-        val preRetry = _retry
-        _retry = null
-        preRetry?.invoke()
-    }
-
     private val initParams = MutableLiveData<InitParams<Value>>()
     private val initStatus = initParams.switchMap {
         liveData {
@@ -79,6 +60,25 @@ abstract class BasePositionalDataSource<Value> : PositionalDataSource<Value>() {
 
     override fun loadRange(params: LoadRangeParams, callback: LoadRangeCallback<Value>) {
         rangeParams.postValue(RangeParams(params, callback))
+    }
+
+    val networkStatus = MediatorLiveData<NetworkStatus>().apply {
+        addSource(initStatus) {
+            if (value != it) {
+                value = it
+            }
+        }
+        addSource(rangeStatus) {
+            if (value != it) {
+                value = it
+            }
+        }
+    }
+
+    fun retry() {
+        val preRetry = _retry
+        _retry = null
+        preRetry?.invoke()
     }
 }
 

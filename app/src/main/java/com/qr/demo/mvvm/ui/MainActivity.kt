@@ -6,6 +6,7 @@ import androidx.core.content.edit
 import androidx.lifecycle.Observer
 import androidx.lifecycle.liveData
 import com.qr.demo.mvvm.R
+import com.qr.demo.mvvm.model.repository.Repository
 import com.qr.library.mvvm.livedata.throttleFirst
 import com.qr.library.mvvm.log.logD
 import com.qr.library.mvvm.log.logV
@@ -37,6 +38,10 @@ class MainActivity : DaggerAppCompatActivity() {
                 logV(str)
             }
             sharedPreferences.edit().remove("1").apply()
+        })
+
+        Repository().getListing().pagedList.observe(this, Observer {
+            logD(it.toString())
         })
     }
 }

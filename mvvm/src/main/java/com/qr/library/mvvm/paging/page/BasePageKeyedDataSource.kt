@@ -9,26 +9,6 @@ import com.qr.library.mvvm.repository.NetworkStatus
 
 abstract class BasePageKeyedDataSource<Key, Value> : PageKeyedDataSource<Key, Value>() {
     private var _retry: (() -> Unit)? = null
-    val networkStatus = MediatorLiveData<NetworkStatus>().apply {
-        addSource(initStatus) {
-            if (value != it) {
-                value = it
-            }
-        }
-
-        addSource(afterStatus) {
-            if (value != it) {
-                value = it
-            }
-        }
-    }
-
-    fun retry() {
-        val preRetry = _retry
-        _retry = null
-        preRetry?.invoke()
-    }
-
 
     private val initParams = MutableLiveData<InitParams<Key, Value>>()
     private val initStatus = initParams.switchMap {
@@ -76,12 +56,35 @@ abstract class BasePageKeyedDataSource<Key, Value> : PageKeyedDataSource<Key, Va
     }
 
     @Throws(exceptionClasses = [Exception::class])
-    protected abstract suspend fun loadAfterImpl(params: LoadParams<Key>, callback: LoadCallback<Key, Value>)
+    protected abstract suspend fun loadAfterImpl(
+        params: LoadParams<Key>,
+        callback: LoadCallback<Key, Value>
+    )
 
     override fun loadAfter(params: LoadParams<Key>, callback: LoadCallback<Key, Value>) {
         afterParams.postValue(AfterParams(params, callback))
     }
 
     override fun loadBefore(params: LoadParams<Key>, callback: LoadCallback<Key, Value>) {
+    }
+
+    val networkStatus = MediatorLiveData<NetworkStatus>().apply {
+        addSource(initStatus) {
+            if (value != it) {
+                value = it
+            }
+        }
+
+        addSource(afterStatus) {
+            if (value != it) {
+                value = it
+            }
+        }
+    }
+
+    fun retry() {
+        val preRetry = _retry
+        _retry = null
+        preRetry?.invoke()
     }
 }

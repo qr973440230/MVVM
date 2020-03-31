@@ -11,25 +11,6 @@ import com.qr.library.mvvm.repository.NetworkStatus
 abstract class BaseItemKeyedDataSource<Key, Value> : ItemKeyedDataSource<Key, Value>() {
     private var _retry: (() -> Unit)? = null
 
-    val networkStatus = MediatorLiveData<NetworkStatus>().apply {
-        addSource(initStatus) {
-            if (value != it) {
-                value = it
-            }
-        }
-        addSource(afterStatus) {
-            if (value != it) {
-                value = it
-            }
-        }
-    }
-
-    fun retry() {
-        val preRetry = _retry
-        _retry = null
-        preRetry?.invoke()
-    }
-
     private val initParams = MutableLiveData<InitParams<Key, Value>>()
     private val initStatus = initParams.switchMap {
         liveData {
@@ -83,6 +64,25 @@ abstract class BaseItemKeyedDataSource<Key, Value> : ItemKeyedDataSource<Key, Va
     }
 
     override fun loadBefore(params: LoadParams<Key>, callback: LoadCallback<Value>) {
+    }
+
+    val networkStatus = MediatorLiveData<NetworkStatus>().apply {
+        addSource(initStatus) {
+            if (value != it) {
+                value = it
+            }
+        }
+        addSource(afterStatus) {
+            if (value != it) {
+                value = it
+            }
+        }
+    }
+
+    fun retry() {
+        val preRetry = _retry
+        _retry = null
+        preRetry?.invoke()
     }
 }
 
