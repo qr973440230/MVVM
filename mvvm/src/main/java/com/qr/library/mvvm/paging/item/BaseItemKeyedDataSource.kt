@@ -1,30 +1,20 @@
 package com.qr.library.mvvm.paging.item
 
-import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.liveData
-import androidx.lifecycle.switchMap
 import androidx.paging.ItemKeyedDataSource
 import com.qr.library.mvvm.repository.NetworkStatus
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 
 abstract class BaseItemKeyedDataSource<Key, Value> : ItemKeyedDataSource<Key, Value>() {
     private var _retry: (() -> Unit)? = null
 
-    private val initParams = MutableLiveData<InitParams<Key, Value>>()
-    private val initStatus = initParams.switchMap {
-        liveData {
-            emit(NetworkStatus.LOADING)
-            try {
-                loadInitImpl(it.params, it.callback)
-                emit(NetworkStatus.SUCCESS)
-                _retry = null
-            } catch (e: Exception) {
-                emit(NetworkStatus.error(e.message))
-                it.callback.onError(e)
-                _retry = { initParams.postValue(it) }
-            }
-        }
+    val networkStatus = MutableLiveData<NetworkStatus>()
+    fun retry() {
+        val preRetry = _retry
+        _retry = null
+        preRetry?.invoke()
     }
 
     @Throws(exceptionClasses = [Exception::class])
@@ -34,21 +24,16 @@ abstract class BaseItemKeyedDataSource<Key, Value> : ItemKeyedDataSource<Key, Va
     )
 
     override fun loadInitial(params: LoadInitialParams<Key>, callback: LoadInitialCallback<Value>) {
-        initParams.postValue(InitParams(params, callback))
-    }
-
-    private val afterParams = MutableLiveData<AfterParams<Key, Value>>()
-    private val afterStatus = afterParams.switchMap {
-        liveData {
-            emit(NetworkStatus.LOADING)
+        GlobalScope.launch {
             try {
-                loadAfterImpl(it.params, it.callback)
-                emit(NetworkStatus.SUCCESS)
+                networkStatus.postValue(NetworkStatus.LOADING)
+                loadInitImpl(params, callback)
+                networkStatus.postValue(NetworkStatus.SUCCESS)
                 _retry = null
             } catch (e: Exception) {
-                it.callback.onError(e)
-                emit(NetworkStatus.error(e.message))
-                _retry = { afterParams.postValue(it) }
+                callback.onError(e)
+                networkStatus.postValue(NetworkStatus.error(e.message))
+                _retry = { loadInitial(params, callback) }
             }
         }
     }
@@ -60,29 +45,21 @@ abstract class BaseItemKeyedDataSource<Key, Value> : ItemKeyedDataSource<Key, Va
     )
 
     override fun loadAfter(params: LoadParams<Key>, callback: LoadCallback<Value>) {
-        afterParams.postValue(AfterParams(params, callback))
+        GlobalScope.launch {
+            try {
+                networkStatus.postValue(NetworkStatus.LOADING)
+                loadAfterImpl(params, callback)
+                networkStatus.postValue(NetworkStatus.SUCCESS)
+                _retry = null
+            } catch (e: Exception) {
+                callback.onError(e)
+                networkStatus.postValue(NetworkStatus.error(e.message))
+                _retry = { loadAfter(params, callback) }
+            }
+        }
     }
 
     override fun loadBefore(params: LoadParams<Key>, callback: LoadCallback<Value>) {
-    }
-
-    val networkStatus = MediatorLiveData<NetworkStatus>().apply {
-        addSource(initStatus) {
-            if (value != it) {
-                value = it
-            }
-        }
-        addSource(afterStatus) {
-            if (value != it) {
-                value = it
-            }
-        }
-    }
-
-    fun retry() {
-        val preRetry = _retry
-        _retry = null
-        preRetry?.invoke()
     }
 }
 

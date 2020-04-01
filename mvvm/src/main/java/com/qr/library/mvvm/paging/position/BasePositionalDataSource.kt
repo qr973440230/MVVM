@@ -1,29 +1,19 @@
 package com.qr.library.mvvm.paging.position
 
-import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.liveData
-import androidx.lifecycle.switchMap
 import androidx.paging.PositionalDataSource
 import com.qr.library.mvvm.repository.NetworkStatus
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 abstract class BasePositionalDataSource<Value> : PositionalDataSource<Value>() {
     private var _retry: (() -> Unit)? = null
+    val networkStatus = MutableLiveData<NetworkStatus>()
 
-    private val initParams = MutableLiveData<InitParams<Value>>()
-    private val initStatus = initParams.switchMap {
-        liveData {
-            emit(NetworkStatus.LOADING)
-            try {
-                loadInitImpl(it.params, it.callback)
-                emit(NetworkStatus.SUCCESS)
-                _retry = null
-            } catch (e: Exception) {
-                it.callback.onError(e)
-                emit(NetworkStatus.error(e.message))
-                _retry = { initParams.postValue(it) }
-            }
-        }
+    fun retry() {
+        val preRetry = _retry
+        _retry = null
+        preRetry?.invoke()
     }
 
     @Throws(exceptionClasses = [Exception::class])
@@ -33,21 +23,16 @@ abstract class BasePositionalDataSource<Value> : PositionalDataSource<Value>() {
     )
 
     override fun loadInitial(params: LoadInitialParams, callback: LoadInitialCallback<Value>) {
-        initParams.postValue(InitParams(params, callback))
-    }
-
-    private val rangeParams = MutableLiveData<RangeParams<Value>>()
-    private val rangeStatus = rangeParams.switchMap {
-        liveData {
-            emit(NetworkStatus.LOADING)
+        GlobalScope.launch {
             try {
-                loadRangeImpl(it.params, it.callback)
-                emit(NetworkStatus.SUCCESS)
+                networkStatus.postValue(NetworkStatus.LOADING)
+                loadInitImpl(params, callback)
+                networkStatus.postValue(NetworkStatus.SUCCESS)
                 _retry = null
             } catch (e: Exception) {
-                it.callback.onError(e)
-                emit(NetworkStatus.error(e.message))
-                _retry = { rangeParams.postValue(it) }
+                callback.onError(e)
+                networkStatus.postValue(NetworkStatus.error(e.message))
+                _retry = { loadInitial(params, callback) }
             }
         }
     }
@@ -59,26 +44,18 @@ abstract class BasePositionalDataSource<Value> : PositionalDataSource<Value>() {
     )
 
     override fun loadRange(params: LoadRangeParams, callback: LoadRangeCallback<Value>) {
-        rangeParams.postValue(RangeParams(params, callback))
-    }
-
-    val networkStatus = MediatorLiveData<NetworkStatus>().apply {
-        addSource(initStatus) {
-            if (value != it) {
-                value = it
+        GlobalScope.launch {
+            try {
+                networkStatus.postValue(NetworkStatus.LOADING)
+                loadRangeImpl(params, callback)
+                networkStatus.postValue(NetworkStatus.SUCCESS)
+                _retry = null
+            } catch (e: Exception) {
+                callback.onError(e)
+                networkStatus.postValue(NetworkStatus.error(e.message))
+                _retry = { loadRange(params, callback) }
             }
         }
-        addSource(rangeStatus) {
-            if (value != it) {
-                value = it
-            }
-        }
-    }
-
-    fun retry() {
-        val preRetry = _retry
-        _retry = null
-        preRetry?.invoke()
     }
 }
 
