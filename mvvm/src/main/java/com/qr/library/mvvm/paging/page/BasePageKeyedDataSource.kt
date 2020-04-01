@@ -33,7 +33,6 @@ abstract class BasePageKeyedDataSource<Key, Value> : PageKeyedDataSource<Key, Va
                 networkStatus.postValue(NetworkStatus.SUCCESS)
                 _retry = null
             } catch (e: Exception) {
-                callback.onError(e)
                 networkStatus.postValue(NetworkStatus.error(e.message))
                 _retry = { loadInitial(params, callback) }
             }
@@ -54,7 +53,6 @@ abstract class BasePageKeyedDataSource<Key, Value> : PageKeyedDataSource<Key, Va
                 networkStatus.postValue(NetworkStatus.SUCCESS)
                 _retry = null
             } catch (e: Exception) {
-                callback.onError(e)
                 networkStatus.postValue(NetworkStatus.error(e.message))
                 _retry = { loadAfter(params, callback) }
             }

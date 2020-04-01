@@ -31,7 +31,6 @@ abstract class BaseItemKeyedDataSource<Key, Value> : ItemKeyedDataSource<Key, Va
                 networkStatus.postValue(NetworkStatus.SUCCESS)
                 _retry = null
             } catch (e: Exception) {
-                callback.onError(e)
                 networkStatus.postValue(NetworkStatus.error(e.message))
                 _retry = { loadInitial(params, callback) }
             }
@@ -52,7 +51,6 @@ abstract class BaseItemKeyedDataSource<Key, Value> : ItemKeyedDataSource<Key, Va
                 networkStatus.postValue(NetworkStatus.SUCCESS)
                 _retry = null
             } catch (e: Exception) {
-                callback.onError(e)
                 networkStatus.postValue(NetworkStatus.error(e.message))
                 _retry = { loadAfter(params, callback) }
             }

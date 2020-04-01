@@ -30,7 +30,6 @@ abstract class BasePositionalDataSource<Value> : PositionalDataSource<Value>() {
                 networkStatus.postValue(NetworkStatus.SUCCESS)
                 _retry = null
             } catch (e: Exception) {
-                callback.onError(e)
                 networkStatus.postValue(NetworkStatus.error(e.message))
                 _retry = { loadInitial(params, callback) }
             }
@@ -51,7 +50,6 @@ abstract class BasePositionalDataSource<Value> : PositionalDataSource<Value>() {
                 networkStatus.postValue(NetworkStatus.SUCCESS)
                 _retry = null
             } catch (e: Exception) {
-                callback.onError(e)
                 networkStatus.postValue(NetworkStatus.error(e.message))
                 _retry = { loadRange(params, callback) }
             }
