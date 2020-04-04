@@ -1,15 +1,13 @@
-package com.qr.library.mvvm.paging.adapter
+package com.qr.library.mvvm.recyclerview.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
-import androidx.paging.PagedListAdapter
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.qr.library.mvvm.recyclerview.viewholder.BaseViewHolder
 
-abstract class BaseAdapter<T, DB : ViewDataBinding>(diffCallback: DiffUtil.ItemCallback<T>) :
-    PagedListAdapter<T, BaseAdapter.BaseViewHolder<DB>>(diffCallback) {
+abstract class BaseAdapter<T, DB : ViewDataBinding> : RecyclerView.Adapter<BaseViewHolder<DB>>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder<DB> {
         val inflater = LayoutInflater.from(parent.context)
@@ -18,9 +16,4 @@ abstract class BaseAdapter<T, DB : ViewDataBinding>(diffCallback: DiffUtil.ItemC
     }
 
     protected abstract fun layoutId(): Int
-
-    class BaseViewHolder<DB : ViewDataBinding>(val binding: DB) :
-        RecyclerView.ViewHolder(binding.root) {
-
-    }
 }
